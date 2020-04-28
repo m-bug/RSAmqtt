@@ -1,4 +1,4 @@
-package util;
+package ch.mbug.com.util;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -26,13 +26,6 @@ public interface EncryptionClient {
      * @return returns decrypted message as String
      */
     String decrypt(byte[] encryptedMessage, PrivateKey privateKey);
-
-
-    /**
-     * generates a keypair (private- and public key)
-     */
-    void generateKeyPair();
-
 
 
 }
