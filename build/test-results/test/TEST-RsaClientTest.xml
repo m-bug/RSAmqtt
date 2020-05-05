@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="RsaClientTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-04-28T15:11:51" hostname="LENOVO-L390-YOG" time="0.882">
+<testsuite name="RsaClientTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2020-05-05T15:00:33" hostname="LENOVO-L390-YOG" time="0.089">
   <properties/>
-  <testcase name="testDecrypt()" classname="RsaClientTest" time="0.882"/>
-  <system-out><![CDATA[]]></system-out>
+  <testcase name="testEncrypt()" classname="RsaClientTest" time="0.059"/>
+  <testcase name="testDecrypt()" classname="RsaClientTest" time="0.027"/>
+  <system-out><![CDATA[X.509
+X.509
+X.509
+X.509
+]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

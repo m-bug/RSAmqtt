@@ -17,7 +17,6 @@ public interface EncryptionClient {
      */
     byte[] encrypt(String message, PublicKey publicKey);
 
-
     /**
      * decrypts a message with private key and returns decrypted message as String
      *

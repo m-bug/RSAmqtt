@@ -1,35 +1,25 @@
 package ch.mbug.com;
 
 import ch.mbug.com.util.EncryptionClient;
-import ch.mbug.com.util.MqttReceiver;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 public class RsaClient implements EncryptionClient {
 
-    public static final int KEY_SIZE = 2048;
     public static final String ALGORITHM = "RSA";
-    public static final String FILENAME = "public.key";
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
@@ -37,16 +27,16 @@ public class RsaClient implements EncryptionClient {
     /*
      * ctor for receiver
      */
-    public RsaClient(PublicKey publicKey) {
+    public RsaClient(PublicKey publicKey, PrivateKey privateKey) {
         setPublicKey(publicKey);
+        setPrivateKey(privateKey);
     }
 
     /*
      * ctor for sender
      */
-    public RsaClient(PublicKey publicKey, PrivateKey privateKey) {
+    public RsaClient(PublicKey publicKey) {
         setPublicKey(publicKey);
-        setPrivateKey(privateKey);
     }
 
     public PrivateKey getPrivateKey() {
@@ -92,36 +82,6 @@ public class RsaClient implements EncryptionClient {
         return new String(decryptMessage);
     }
 
-    /**
-     * generates a keypair (private- and public key)
-     */
-    public void generateKeyPair() {
-        KeyPairGenerator keyGen = null;
-        try {
-            keyGen = KeyPairGenerator.getInstance(ALGORITHM);
-            keyGen.initialize(KEY_SIZE);
-            KeyPair pair = keyGen.generateKeyPair();
-            this.privateKey = pair.getPrivate();
-            this.publicKey = pair.getPublic();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /* save the public key in a file */
-    public void exportPublicKey() {
-
-        byte[] key = this.getPublicKey().getEncoded();
-        Path path = Paths.get(FILENAME);
-        // The method ensures that the file is closed when all bytes have been written ...
-        try {
-            Files.write(path, key);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     /* get the public key from a file */
     public static PublicKey getPublicKeyFromFile(String filename) {
@@ -130,8 +90,9 @@ public class RsaClient implements EncryptionClient {
         PublicKey publicKey = null;
         try {
             keyBytes = Files.readAllBytes(Paths.get(filename));
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
             KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            System.out.println(spec.getFormat());
             publicKey = kf.generatePublic(spec);
 
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -157,20 +118,6 @@ public class RsaClient implements EncryptionClient {
         }
 
         return privateKey;
-    }
-    /*
-    * todo: encoding for encrypted public key, instead of a file
-     */
-    public static PublicKey getEncryptedPublicKey(String base64PublicKey) {
-        PublicKey publicKey = null;
-        try {
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
-            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
-            publicKey = keyFactory.generatePublic(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return publicKey;
     }
 
 }

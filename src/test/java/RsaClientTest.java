@@ -1,3 +1,6 @@
+import ch.mbug.com.RsaClient;
+import ch.mbug.com.util.MqttReceiver;
+import ch.mbug.com.util.MqttSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +11,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class RsaClientTest {
 
     public static final String MESSAGE = "Ich bin eine Message";
-    RsaClient client = new RsaClient();
+    public static final String PUBLIC = "keys/public_key.der";
+    public static final String PRIVATE = "keys/private_key.der";
+
+    // sender
+    RsaClient senderClient = new RsaClient(RsaClient.getPublicKeyFromFile(PUBLIC));
+    MqttSender sender = new MqttSender();
+
+    // receiver
+    RsaClient receiverClient = new RsaClient(RsaClient.getPublicKeyFromFile(PUBLIC), RsaClient.getPrivateKeyFromFile(PRIVATE));
+    MqttReceiver receiver = new MqttReceiver(receiverClient);
+
 
     @BeforeEach
     void setUp() {
@@ -17,21 +30,17 @@ public class RsaClientTest {
 
     @Test
     public void testEncrypt() {
-        client.generateKeyPair();
-        assertNotNull(client.getPublicKey());
-        byte[] encryptedText = client.encrypt(MESSAGE, client.getPublicKey());
+        byte[] encryptedText = senderClient.encrypt(MESSAGE, senderClient.getPublicKey());
         assertNotEquals(MESSAGE, encryptedText);
     }
 
     @Test
     public void testDecrypt() {
-        client.generateKeyPair();
-        assertNotNull(client.getPublicKey());
-        byte[] encryptedText = client.encrypt(MESSAGE, client.getPublicKey());
+        byte[] encryptedText = receiverClient.encrypt(MESSAGE, receiverClient.getPublicKey());
         assertNotEquals(MESSAGE, encryptedText);
 
         // test decryption
-        String decryptedMessage = client.decrypt(encryptedText, client.getPrivateKey());
+        String decryptedMessage = receiverClient.decrypt(encryptedText, receiverClient.getPrivateKey());
         assertNotNull(decryptedMessage);
         assertEquals(MESSAGE, decryptedMessage);
     }
